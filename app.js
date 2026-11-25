@@ -21,7 +21,16 @@
     if (updateHash) history.replaceState(null, '', `#${current + 1}`);
   }
   function fit() {
-    if (!reading) $('canvas').style.transform = `translate(-50%,-50%) scale(${Math.min(innerWidth / 1600, innerHeight / 900)})`;
+    if (reading) return;
+
+    const width = document.documentElement.clientWidth;
+    const height = window.innerHeight;
+    const scale = Math.min(width / 1600, height / 900);
+
+    const canvas = $('canvas');
+
+    canvas.style.transform =
+      `translate(-50%, -50%) scale(${scale})`;
   }
   function setMode(mode, scroll = true) {
     reading = mode === 'read';
@@ -37,9 +46,13 @@
     if (reading || current === 1) requestAnimationFrame(() => usageChart?.resize());
   }
   function automaticMode(initial = false) {
-    const mode = manualMode || (innerWidth < 1200 || innerHeight > innerWidth ? 'read' : 'slides');
-    if ((mode === 'read') !== reading) setMode(mode, !initial);
-    else fit();
+    const mode = manualMode || 'slides';
+
+    if ((mode === 'read') !== reading) {
+      setMode(mode, !initial);
+    } else {
+      fit();
+    }
   }
   function go(n, scroll = true) {
     current = Math.max(0, Math.min(slides.length - 1, n));
